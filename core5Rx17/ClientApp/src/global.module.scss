@@ -1,0 +1,32 @@
+﻿
+/* variables.scss*/
+$white-color: #fcf5ed;
+$dark-color: #402f2b;
+$light-color: #e6d5c3;
+$medium-color: #977978;
+$alert-color: #cb492a;
+$light-black-color: #706e72;
+$black-color: #414042;
+
+/*** 將 SCSS 變數匯出成 JsvaScript 物件 ***/
+:export {
+  colors: {
+    white: $white-color;
+    dark: $dark-color;
+    light: $light-color;
+    medium: $medium-color;
+    alert: $alert-color;
+    lightblack: $light-black-color;
+    black: $black-color;
+  }
+}
+
+/*** SCSS class 將會自動匯出成 JsvaScript 物件之 className ***/
+.container /* 轉譯成 .container */ {
+  background: red;
+  color: white;
+
+  .hello /* 轉譯成 .container.hello */ {
+    padding-left: 50px;
+  }
+}

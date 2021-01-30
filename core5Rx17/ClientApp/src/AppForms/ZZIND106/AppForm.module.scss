@@ -1,0 +1,24 @@
+
+.root {
+  min-height: 100vh;
+  background-image: url(/assets/images/picture/angelina-yan-joldj0Oan6Y-unsplash.jpg);
+  background-size: cover;
+  background-position: center;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.box {
+  width: 480px;
+  height: 280px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter:blur(10px);
+  color:white;
+  font-size:48px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
+  box-shadow: 0px 0px 16px 0px rgba(255,255,255,0.5);
+}
