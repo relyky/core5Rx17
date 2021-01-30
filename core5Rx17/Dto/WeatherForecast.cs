@@ -1,6 +1,6 @@
 using System;
 
-namespace core5Rx17
+namespace core5Rx17.Dto
 {
     public class WeatherForecast
     {
