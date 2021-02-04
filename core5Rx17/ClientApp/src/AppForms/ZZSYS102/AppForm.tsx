@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
-import { Box, Container, Paper, Grow, Collapse, Slide, Zoom, Fade } from '@material-ui/core';
+import { Box, Container, Paper, Grow, Collapse, Slide, Zoom, Fade, Backdrop } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faImage, faPortrait } from '@fortawesome/free-solid-svg-icons'
@@ -15,8 +15,10 @@ import {
 } from "react-device-detect"
 import { Blockquote, H1, H2, H4, P1, Pre } from 'Widgets/TypographyEx';
 import { AppContainer } from 'Outlines/OutlineWidgets';
+import { useIdleTimer } from 'react-idle-timer'
+import { format } from 'date-fns'
 
-const useStyles = makeStyles(({ palette, spacing }) => ({
+const useStyles = makeStyles(({ palette, spacing, zIndex }) => ({
   root: {
   },
   orientedBox: {
@@ -39,14 +41,44 @@ const useStyles = makeStyles(({ palette, spacing }) => ({
     padding: spacing(5, 0),
     background: palette.secondary.main,
     color: palette.secondary.contrastText,
-  }
+  },
+  backdrop: {
+    zIndex: zIndex.drawer + 1,
+  },
 }));
 
 export default function AppForm({ formProfile, isLandscape, isPortrait }: AppFormProps) {
   const classes = useStyles()
   const [deviceInfo] = useState(() => deviceDetect())
+  const [idleInfo, setIdleInfo] = useState<any>({event:'none'})
 
-  console.log(`${formProfile.FORM_ID}.render`, { formProfile })
+  const { getRemainingTime, getLastActiveTime } = useIdleTimer({
+    timeout: 5 * 1000,
+    debounce: 0,
+    onIdle: e => {
+      const lastActiveTime = format(new Date(getLastActiveTime()),'HH:mm:ss')
+      const remainingTime = getRemainingTime()
+      const eventName = e?.constructor.name
+      //console.log('onIdle', { lastActiveTime, remainingTime, eventName })
+      setIdleInfo({event:'onIdle', lastActiveTime, remainingTime, eventName })
+    },
+    onActive: e => {
+      const lastActiveTime = format(new Date(getLastActiveTime()),'HH:mm:ss')
+      const remainingTime = getRemainingTime()
+      const eventName = e?.constructor.name
+      //console.log('onActive', { lastActiveTime, remainingTime, eventName: eventName })
+      setIdleInfo({event:'onActive', lastActiveTime, remainingTime, eventName })
+    },
+    onAction: e => {
+      const lastActiveTime = format(new Date(getLastActiveTime()),'HH:mm:ss')
+      const remainingTime = getRemainingTime()
+      const eventName = e?.constructor.name
+      //console.log('onDidAction', { lastActiveTime, remainingTime, eventName })
+      setIdleInfo({event:'onDidAction', lastActiveTime, remainingTime, eventName })
+    }
+  })
+
+  //console.log(`${formProfile.FORM_ID}.render`, { formProfile })
   return (
     <div className={classes.root}>
       <h1>{`${formProfile.FORM_ID}:${formProfile.FORM_TITLE}`}</h1>
@@ -78,12 +110,20 @@ export default function AppForm({ formProfile, isLandscape, isPortrait }: AppFor
           </Box>
         </WellPaper>
 
+        <WellPaper>
+          <H4>Idle in 5s</H4>
+          <Pre>
+            {JSON.stringify(idleInfo, null, '  ')}
+          </Pre>
+        </WellPaper>
+        
         <BrowserView>
           <WellPaper>
             <H1> This is rendered only in browser </H1>
             <P1>放置 Browser 專用元件,如：DatePicker或FilterSelector</P1>
           </WellPaper>
         </BrowserView>
+
         <MobileView>
           <WellPaper>
             <H2> This is rendered only on mobile </H2>
@@ -103,7 +143,9 @@ export default function AppForm({ formProfile, isLandscape, isPortrait }: AppFor
             {JSON.stringify(deviceInfo, null, '  ')}
           </Pre>
         </WellPaper>
+
       </AppContainer>
+      <Backdrop className={classes.backdrop} open={idleInfo.event === 'onIdle'} />
     </div>
   )
 }
